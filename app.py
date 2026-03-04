@@ -8,8 +8,8 @@ from logic import convert_mp4_to_mp3, transcribe_audio, get_api_key, get_ai_cuts
 from flask_cors import CORS
 import ast
 
-api_key = get_api_key("presentation/api_key.txt")
-app = Flask(__name__, template_folder='../presentation/templates', static_folder='../presentation/static')
+api_key = get_api_key("api_key.txt")
+app = Flask(__name__, template_folder='', static_folder='../presentation/static')
 
 CORS(app)
 
