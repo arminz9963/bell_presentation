@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BeLL Videoschnitt-KI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        font-family: "Inter", sans-serif;
+        background: #030712;
+        color: #f3f4f6;
+        margin: 0;
+        padding: 0;
+      }
+
+      .gradient-text {
+        background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      #VideoInputLabel {
+        border: 2px dashed #1f2937;
+        transition: border-color 0.2s, background 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        cursor: pointer;
+        border-radius: 12px;
+        padding: 48px 24px;
+        background: #0d1117;
+      }
+      #VideoInputLabel:hover {
+        border-color: #6366f1;
+        background: rgba(99, 102, 241, 0.05);
+      }
+
+      video {
+        border-radius: 12px;
+        background: #000;
+        display: block;
+        width: 100%;
+      }
+
+      /* Raw answer */
+      #rawAnswerContent {
+        display: none;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      #rawAnswerContent::-webkit-scrollbar {
+        width: 4px;
+      }
+      #rawAnswerContent::-webkit-scrollbar-track {
+        background: #0d1117;
+      }
+      #rawAnswerContent::-webkit-scrollbar-thumb {
+        background: #374151;
+        border-radius: 2px;
+      }
+
+      .schnitt-btn {
+        transition: background 0.15s, transform 0.1s;
+      }
+      .schnitt-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .spinner {
+        animation: spin 0.8s linear infinite;
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      min-height: 100vh;
+      padding: 48px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    "
+  >
+    <div style="width: 100%; max-width: 900px" class="space-y-6">
+      <!-- Header -->
+      <header style="text-align: center; padding: 24px 0 12px">
+        <h1
+          class="gradient-text"
+          style="
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0;
+          "
+        >
+          BeLL Videoschnitt-KI
+        </h1>
+        <p style="color: #4b5563; margin-top: 8px; font-size: 0.875rem">
+          Automatische Schnitterkennung mit KI · v13
+        </p>
+      </header>
+
+      <!-- Video Upload -->
+      <div
+        style="
+          background: #0d1117;
+          border: 1px solid #1f2937;
+          border-radius: 16px;
+          padding: 24px;
+        "
+      >
+        <p
+          style="
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 0 0 16px;
+          "
+        >
+          Video
+        </p>
+
+        <input
+          type="file"
+          id="VideoInput"
+          accept="video/mp4"
+          style="display: none"
+        />
+        <label for="VideoInput" id="VideoInputLabel">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            style="width: 40px; height: 40px; color: #374151"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
+            />
+          </svg>
+          <span style="color: #9ca3af; font-size: 0.875rem; font-weight: 500"
+            >MP4 auswählen</span
+          >
+          <span style="color: #4b5563; font-size: 0.75rem"
+            >Klicken zum Durchsuchen</span
+          >
+        </label>
+
+        <div id="VideoContainer" style="display: none; margin-top: 20px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <p
+                style="
+                  font-size: 0.65rem;
+                  font-weight: 600;
+                  color: #6b7280;
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin: 0 0 8px;
+                "
+              >
+                Original
+              </p>
+              <video id="VideoPlayer" controls></video>
+            </div>
+            <div>
+              <p
+                style="
+                  font-size: 0.65rem;
+                  font-weight: 600;
+                  color: #6b7280;
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin: 0 0 8px;
+                "
+              >
+                Geschnitten
+              </p>
+              <video id="VideoPlayer2" controls></video>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cut Controls -->
+      <div id="schnitt" style="display: none">
+        <div
+          style="
+            background: #0d1117;
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+          "
+        >
+          <p
+            style="
+              font-size: 0.65rem;
+              font-weight: 600;
+              color: #6b7280;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin: 0 0 16px;
+            "
+          >
+            Schnitt Konfiguration
+          </p>
+
+          <label
+            style="
+              display: block;
+              font-size: 0.75rem;
+              color: #6b7280;
+              margin-bottom: 6px;
+            "
+            >Was soll geschnitten werden?</label
+          >
+          <textarea
+            id="BeschreibungInput"
+            rows="3"
+            style="
+              width: 100%;
+              background: #111827;
+              border: 1px solid #1f2937;
+              border-radius: 8px;
+              padding: 12px 14px;
+              font-size: 0.875rem;
+              color: #f3f4f6;
+              outline: none;
+              font-family: inherit;
+              resize: none;
+              margin-bottom: 16px;
+            "
+            placeholder="z.B. Entferne alle Pausen länger als 2 Sekunden und Versprecher"
+            onfocus="this.style.borderColor='#6366f1'"
+            onblur="this.style.borderColor='#1f2937'"
+          ></textarea>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap">
+            <button
+              id="CutVideoBtn"
+              style="
+                flex: 1;
+                min-width: 160px;
+                background: #4f46e5;
+                border: none;
+                color: white;
+                font-weight: 500;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-family: inherit;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transition: background 0.2s;
+              "
+              onmouseover="this.style.background='#6366f1'"
+              onmouseout="this.style.background='#4f46e5'"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                style="width: 16px; height: 16px"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"
+                />
+              </svg>
+              Schneide das Video
+            </button>
+
+            <button
+              id="PlayCutBtn"
+              style="
+                flex: 1;
+                min-width: 160px;
+                background: #7c3aed;
+                border: none;
+                color: white;
+                font-weight: 500;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-family: inherit;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transition: background 0.2s;
+              "
+              onmouseover="this.style.background='#8b5cf6'"
+              onmouseout="this.style.background='#7c3aed'"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                style="width: 16px; height: 16px"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Geschnittenes Video abspielen
+            </button>
+          </div>
+        </div>
+
+        <!-- Schnitt Buttons -->
+        <div
+          id="schnittListe"
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px"
+        ></div>
+
+        <!-- Raw Answer Accordion -->
+        <div
+          id="rawAnswerPanel"
+          style="
+            display: none;
+            background: #0d1117;
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            overflow: hidden;
+          "
+        >
+          <button
+            id="rawAnswerHeader"
+            style="
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 16px 24px;
+              background: none;
+              border: none;
+              cursor: pointer;
+              color: #d1d5db;
+              font-size: 0.875rem;
+              font-weight: 500;
+              font-family: inherit;
+            "
+            onmouseover="this.style.background='#111827'"
+            onmouseout="this.style.background='none'"
+          >
+            <span style="display: flex; align-items: center; gap: 8px">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                style="width: 16px; height: 16px; color: #818cf8"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              Raw Answer (KI-Ausgabe)
+            </span>
+            <svg
+              id="rawArrow"
+              xmlns="http://www.w3.org/2000/svg"
+              style="
+                width: 16px;
+                height: 16px;
+                color: #6b7280;
+                transition: transform 0.2s;
+              "
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            id="rawAnswerContent"
+            style="
+              padding: 0 24px 20px;
+              font-family: monospace;
+              font-size: 0.75rem;
+              color: #4ade80;
+              background: #030712;
+              white-space: pre-wrap;
+              line-height: 1.6;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <footer
+      style="
+        margin-top: 64px;
+        text-align: center;
+        color: #1f2937;
+        font-size: 0.75rem;
+        padding-bottom: 32px;
+      "
+    >
+      <p>&copy; 2025 BeLL Videoschnitt-KI</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
