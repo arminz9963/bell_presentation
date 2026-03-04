@@ -62,9 +62,20 @@ rawAnswerHeader.addEventListener("click", function () {
 
 CutVideoBtn.addEventListener("click", function () {
     const beschreibung = BeschreibungInput.value;
+    const ip    = document.getElementById("serverIP").value.trim();
+    const port  = document.getElementById("serverPort").value.trim();
+    const token = document.getElementById("serverToken").value.trim();
 
     if (!transkript) {
         alert("Die Transkription ist noch nicht abgeschlossen – bitte habe einen Moment Geduld.");
+        return;
+    }
+    if (!beschreibung || beschreibung.trim() === "") {
+        alert("Bitte gib eine Beschreibung ein!");
+        return;
+    }
+    if (!ip || !port || !token) {
+        alert("Bitte fülle alle Server-Felder aus (IP, Port, Token)!");
         return;
     }
 
@@ -79,7 +90,7 @@ CutVideoBtn.addEventListener("click", function () {
     fetch("/cut_video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transkript, beschreibung }),
+        body: JSON.stringify({ transkript, beschreibung, ip, port, token }),
     })
         .then((response) => response.json())
         .then((data) => {

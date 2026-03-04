@@ -24,14 +24,12 @@
         margin: 0;
         padding: 0;
       }
-
       .gradient-text {
         background: linear-gradient(90deg, #60a5fa, #a78bfa);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
-
       #VideoInputLabel {
         border: 2px dashed #1f2937;
         transition: border-color 0.2s, background 0.2s;
@@ -49,15 +47,12 @@
         border-color: #6366f1;
         background: rgba(99, 102, 241, 0.05);
       }
-
       video {
         border-radius: 12px;
         background: #000;
         display: block;
         width: 100%;
       }
-
-      /* Raw answer */
       #rawAnswerContent {
         display: none;
         max-height: 220px;
@@ -73,14 +68,12 @@
         background: #374151;
         border-radius: 2px;
       }
-
       .schnitt-btn {
         transition: background 0.15s, transform 0.1s;
       }
       .schnitt-btn:hover {
         transform: translateY(-1px);
       }
-
       @keyframes spin {
         to {
           transform: rotate(360deg);
@@ -88,6 +81,21 @@
       }
       .spinner {
         animation: spin 0.8s linear infinite;
+      }
+      .config-input {
+        width: 100%;
+        background: #111827;
+        border: 1px solid #1f2937;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        color: #f3f4f6;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+      .config-input:focus {
+        border-color: #6366f1;
       }
     </style>
   </head>
@@ -101,9 +109,9 @@
       align-items: center;
     "
   >
-    <div style="width: 100%; max-width: 900px" class="space-y-6">
+    <div style="width: 100%; max-width: 900px">
       <!-- Header -->
-      <header style="text-align: center; padding: 24px 0 12px">
+      <header style="text-align: center; padding: 24px 0 32px">
         <h1
           class="gradient-text"
           style="
@@ -120,6 +128,85 @@
         </p>
       </header>
 
+      <!-- Server Config -->
+      <div
+        style="
+          background: #0d1117;
+          border: 1px solid #1f2937;
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 16px;
+        "
+      >
+        <p
+          style="
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 0 0 16px;
+          "
+        >
+          Server Konfiguration
+        </p>
+        <div
+          style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px"
+        >
+          <div>
+            <label
+              style="
+                display: block;
+                font-size: 0.75rem;
+                color: #6b7280;
+                margin-bottom: 6px;
+              "
+              >Server IP</label
+            >
+            <input
+              id="serverIP"
+              type="text"
+              placeholder="z.B. 123.45.67.89"
+              class="config-input"
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                font-size: 0.75rem;
+                color: #6b7280;
+                margin-bottom: 6px;
+              "
+              >Port</label
+            >
+            <input
+              id="serverPort"
+              type="text"
+              placeholder="z.B. 8080"
+              class="config-input"
+            />
+          </div>
+          <div>
+            <label
+              style="
+                display: block;
+                font-size: 0.75rem;
+                color: #6b7280;
+                margin-bottom: 6px;
+              "
+              >Token</label
+            >
+            <input
+              id="serverToken"
+              type="password"
+              placeholder="••••••••••••"
+              class="config-input"
+            />
+          </div>
+        </div>
+      </div>
+
       <!-- Video Upload -->
       <div
         style="
@@ -127,6 +214,7 @@
           border: 1px solid #1f2937;
           border-radius: 16px;
           padding: 24px;
+          margin-bottom: 16px;
         "
       >
         <p
@@ -243,22 +331,9 @@
           <textarea
             id="BeschreibungInput"
             rows="3"
-            style="
-              width: 100%;
-              background: #111827;
-              border: 1px solid #1f2937;
-              border-radius: 8px;
-              padding: 12px 14px;
-              font-size: 0.875rem;
-              color: #f3f4f6;
-              outline: none;
-              font-family: inherit;
-              resize: none;
-              margin-bottom: 16px;
-            "
+            class="config-input"
+            style="resize: none; margin-bottom: 16px"
             placeholder="z.B. Entferne alle Pausen länger als 2 Sekunden und Versprecher"
-            onfocus="this.style.borderColor='#6366f1'"
-            onblur="this.style.borderColor='#1f2937'"
           ></textarea>
 
           <div style="display: flex; gap: 12px; flex-wrap: wrap">
@@ -282,8 +357,8 @@
                 gap: 8px;
                 transition: background 0.2s;
               "
-              onmouseover="this.style.background='#6366f1'"
-              onmouseout="this.style.background='#4f46e5'"
+              onmouseover="if(!this.disabled)this.style.background='#6366f1'"
+              onmouseout="if(!this.disabled)this.style.background='#4f46e5'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -376,7 +451,7 @@
               font-family: inherit;
             "
             onmouseover="this.style.background='#111827'"
-            onmouseout="this.style.background='none'"
+            onmouseout="this.style.background='transparent'"
           >
             <span style="display: flex; align-items: center; gap: 8px">
               <svg

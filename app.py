@@ -11,10 +11,6 @@ import ast
 api_key = get_api_key("presentation/api_key.txt")
 app = Flask(__name__, template_folder='../presentation/templates', static_folder='../presentation/static')
 
-token = "94bf5e0a394b57f8baae8d23703a231929af91783de50a0a635aa890751eceda"
-ip = "45.81.32.2"
-port = "17888"
-
 CORS(app)
 
 
@@ -52,6 +48,9 @@ def cut_video():
     data = request.get_json()
     transkript = data.get("transkript")
     beschreibung = data.get("beschreibung")
+    token = data.get("token")
+    port = data.get("port")
+    ip = data.get("ip")
 
     print(f"Transkript empfangen: {len(transkript)} Wörter")
     print(f"Beschreibung: {beschreibung}")
