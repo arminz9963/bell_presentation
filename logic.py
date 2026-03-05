@@ -15,7 +15,6 @@ def convert_mp4_to_mp3(input_file, output_file):
     command = ["ffmpeg", "-i", input_file, "-vn",
                "-acodec", "libmp3lame", "-ab", "192k", "-ar", "44100", "-y", output_file]
     
-    
     try:
         # Führt Command im Terminal aus
         subprocess.run(command, check=True)
